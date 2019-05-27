@@ -4,8 +4,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-//set json content type
-header('Content-Type: application/json');
+
 
 //example class for json return
 class Example {
@@ -19,9 +18,12 @@ class Example {
 
 $obj = new Example('Hello world!'); //create object
 
-if($_GET['phpinfo'])
+if(isset($_GET['phpinfo']))
     phpinfo();
-else
+else {
+    //set json content type
+    header('Content-Type: application/json');
     echo json_encode($obj); //retun json encoded object to user,
+}
 
 //By Jari Ketting
