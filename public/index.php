@@ -19,6 +19,9 @@ class Example {
 
 $obj = new Example('Hello world!'); //create object
 
-echo json_encode($obj); //retun json encoded object to user,
+if($_GET['phpinfo'])
+    phpinfo();
+else
+    echo json_encode($obj); //retun json encoded object to user,
 
 //By Jari Ketting
