@@ -1,5 +1,5 @@
 {
-  "name": "orbis/api",
+  "name": "Orbis/Api",
   "description": "description_text",
   "minimum-stability": "stable",
   "license": "proprietary",
@@ -8,5 +8,8 @@
       "name": "Jari Ketting",
       "email": "0966887@hr.nl"
     }
-  ]
+  ],
+  "autoload": {
+    "psr-4": {"Orbis\\": "src/"}
+  }
 }
