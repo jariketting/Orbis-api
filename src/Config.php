@@ -9,14 +9,11 @@ class Config
     private static $_ini = null;
 
     public static function loadConfig(string $filename) : bool {
-        $ini = parse_ini_file($filename, true);
+        if(file_exists($filename))
+            self::$_ini = parse_ini_file($filename, true);
 
-        if($ini) {
-            self::$_ini = $ini;
-
+        if(self::$_ini)
             return true;
-        }
-
 
         return false;
     }
