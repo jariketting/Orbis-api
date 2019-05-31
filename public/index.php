@@ -2,12 +2,15 @@
 require_once '../vendor/autoload.php';
 use Orbis\Config;
 use Orbis\Database;
+use Orbis\JsonResponse;
 
-//TODO fatal errors should be outputted in json format, so it could be handled in the APP
+$response = new JsonResponse(); //create response
 
 //stop application if config is not loaded
-if(!Config::loadConfig('../config.ini'))
-    die('Could not get config'); //TODO replace with json error
+if(!Config::loadConfig('../config.ini')) {
+    $response->setResponseCode(500);
+    $response->error('Unable to load config.', 'The config file could not be loaded.');
+}
 
 $config = Config::getConfig(); //store config
 
@@ -24,9 +27,13 @@ if(!Database::init(
     $config['DATABASE']['db'],
     $config['DATABASE']['user'],
     $config['DATABASE']['passwd']
-))
-    die('Could not connect to database'); //TODO replace with json error
+)) {
+    $response->setResponseCode(500);
+    $response->error('Unable to connect to database.', 'No connection could be made to the database');
+}
 
-//header('Content-Type: application/json');
+/**
+ * Do stuff
+ */
 
-Orbis\Helper::test(); //just to show it works!
+$response->print();
