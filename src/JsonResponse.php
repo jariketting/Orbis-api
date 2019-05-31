@@ -21,6 +21,8 @@ class JsonResponse
         $this->_error = true;
         $this->_errorTitle = $title;
         $this->_errorDetail = $detail;
+
+        $this->print();
     }
 
     public function setResponseCode(int $code) : void {
@@ -45,5 +47,7 @@ class JsonResponse
         http_response_code($this->_responseCode);
 
         echo $json;
+
+        exit();
     }
 }
