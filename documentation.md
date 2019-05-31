@@ -3,6 +3,8 @@ All request with their details are listed in this document. Please keep this doc
 
 To test/debug the api use: [Postman](https://www.getpostman.com/)
 
+Base url of API: `https://api.jariketting.nl`
+
 ## Table of contents:
 [Example](#example)
 
