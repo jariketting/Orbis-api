@@ -17,10 +17,17 @@ class JsonResponse
 
     private $_data = []; //data returned
 
-    public function error(string $title, string $detail) : void {
+    /**
+     * Set error
+     *
+     * @param string $title
+     * @param string $detail
+     */
+    public function error(string $title, string $detail, int $responseCode = 500) : void {
         $this->_error = true;
         $this->_errorTitle = $title;
         $this->_errorDetail = $detail;
+        $this->setResponseCode($responseCode);
 
         $this->print();
     }
