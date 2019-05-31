@@ -35,7 +35,7 @@ class Database
 
             return true; //successful connection has been made
         } catch(PDOException $e) {
-            return false; //TODO convert to fatal json error for APP compatibility
+            return false;
         }
     }
 }
