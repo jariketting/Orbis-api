@@ -5,6 +5,7 @@ use Orbis\Helper;
 use Orbis\JsonResponse;
 use Orbis\Router;
 use Orbis\Session;
+use Orbis\User;
 
 Helper::initConfig();
 Helper::initDatabase();
@@ -19,8 +20,11 @@ switch (Router::getType()) {
     case 'validate_session':
         Session::validate();
         break;
+    case 'user';
+        User::request();
+        break;
     default:
-        JsonResponse::error('Invalid type given', 'An type provided but seems to be invalid', 400);
+        JsonResponse::error('Invalid type given', 'A type was provided but seems to be invalid', 400);
         break;
 }
 
