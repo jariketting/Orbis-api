@@ -38,4 +38,13 @@ class Database
             return false;
         }
     }
+
+    /**
+     * Returns connection
+     *
+     * @return PDO
+     */
+    public static function get() : PDO {
+        return self::$_connection;
+    }
 }
