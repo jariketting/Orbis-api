@@ -41,13 +41,15 @@ class Session
         $query->bindParam(':id', $sessionId, PDO::PARAM_STR);
         $query->execute();
 
+        //check if query was executed successful
         if($query)
-            $result = $query->fetch(PDO::FETCH_OBJ)->count;
+            $result = $query->fetch(PDO::FETCH_OBJ)->count; //get count from query data
         else
-            JsonResponse::error();
+            JsonResponse::error(); //something went wrong
 
+        //if result is 1, set valid to true
         if($result)
-            $data['valid'] = true;
+            $data['valid'] = true; //set new value
 
         JsonResponse::setData($data); //set data to created return data
     }
