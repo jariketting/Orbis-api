@@ -31,6 +31,8 @@ abstract class Model
         }
     }
 
+    abstract protected function bindFields();
+
     /**
      * Update database fields
      */

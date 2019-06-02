@@ -1,8 +1,10 @@
 <?php
 namespace Orbis;
 
-use PDO;
-
+/**
+ * Class User
+ * @package Orbis
+ */
 class User extends Model
 {
     private const MODEL = 'user';
@@ -19,9 +21,14 @@ class User extends Model
     public function __construct(string $id) {
         parent::__construct(self::MODEL, $id);
 
+        $this->bindFields();
+    }
+
+    protected function bindFields() {
         $this->id = (int)$this->_fields->id;
         $this->username = (string)$this->_fields->username;
         $this->email = (string)$this->_fields->email;
+        $this->name = (string)$this->_fields->name;
         $this->notifications = (bool)$this->_fields->notifications;
         $this->private = (bool)$this->_fields->private;
         $this->bio = (string)$this->_fields->bio;
@@ -50,15 +57,14 @@ class User extends Model
 
     private static function updateRequest() {
         $id = Router::getIdentifier();
-        $response = ['success' => false];
 
         $user = new User($id);
-        if($user->update())
-            $response['success'] = true;
+        $user->update();
+        $user->bindFields();
 
         if(!$id)
             JsonResponse::error('No identifier given', '', 400);
         else
-            JsonResponse::setData((object)$response);
+            JsonResponse::setData($user);
     }
 }
