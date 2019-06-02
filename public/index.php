@@ -11,13 +11,6 @@ Helper::initConfig();
 
 $config = Config::getConfig(); //store config
 
-//show errors when in debug mode
-if($config['SETTINGS']['debug']) {
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL);
-}
-
 //setup database
 if(!Database::init(
     $config['DATABASE']['host'],
