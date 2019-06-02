@@ -11,10 +11,34 @@ use PDO;
  */
 class Session
 {
+    //database fields
+    public  $id,
+            $user_id;
+
+    public function __construct(string $id) {
+        $query = Database::get()->prepare('
+            SELECT * 
+            FROM session 
+            WHERE id = :id
+            LIMIT 1
+        ');
+        $query->bindParam(':id', $id, PDO::PARAM_STR);
+        $query->execute();
+
+        if(!$query)
+            JsonResponse::error('Session not found', 'The session id was invalid or not found.', 404);
+        else {
+            $session = $query->fetch(PDO::FETCH_OBJ);
+
+            $this->id       = (string)$session->id;
+            $this->user_id  = (int)$session->user_id;
+        }
+    }
+
     /**
      * Validates session id
      */
-    static function validate() : void {
+    public static function validate() : void {
         $db = Database::get(); //get database connection
         $data = ['valid' => false]; //store return data
 
