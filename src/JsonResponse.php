@@ -27,7 +27,7 @@ class JsonResponse
      * @param string $detail detailed description of error
      * @param string $responseCode response code (default is 500, generic error)
      */
-    public static function error(string $title, string $detail, int $responseCode = 500) : void {
+    public static function error(string $title = 'Something went wrong', string $detail = 'Unknown error occurred.', int $responseCode = 500) : void {
         self::$_error = true; //set error to true
         self::$_errorTitle = $title; //set error title
         self::$_errorDetail = $detail; //set error details
