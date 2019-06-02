@@ -9,10 +9,14 @@ namespace Orbis;
  */
 class Helper
 {
+    CONST CONFIG_LOC = '../config.ini';
+
     /**
-     * Just a test function to verify everything's working :-)
+     * Initialize the config
      */
-    static function test() : void {
-        echo 'This is a test'; //return string
+    public static function initConfig() : void {
+        //stop application if config is not loaded
+        if(!Config::loadConfig(self::CONFIG_LOC))
+            JsonResponse::error('Unable to load config.', 'The config file could not be loaded.');
     }
 }

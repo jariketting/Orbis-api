@@ -2,13 +2,12 @@
 require_once '../vendor/autoload.php';
 use Orbis\Config;
 use Orbis\Database;
+use Orbis\Helper;
 use Orbis\JsonResponse;
 use Orbis\Router;
 use Orbis\Session;
 
-//stop application if config is not loaded
-if(!Config::loadConfig('../config.ini'))
-    JsonResponse::error('Unable to load config.', 'The config file could not be loaded.');
+Helper::initConfig();
 
 $config = Config::getConfig(); //store config
 
