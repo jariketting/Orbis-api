@@ -1,24 +1,13 @@
 <?php
 require_once '../vendor/autoload.php';
-use Orbis\Config;
-use Orbis\Database;
+
 use Orbis\Helper;
 use Orbis\JsonResponse;
 use Orbis\Router;
 use Orbis\Session;
 
 Helper::initConfig();
-
-$config = Config::getConfig(); //store config
-
-//setup database
-if(!Database::init(
-    $config['DATABASE']['host'],
-    $config['DATABASE']['db'],
-    $config['DATABASE']['user'],
-    $config['DATABASE']['passwd']
-))
-    JsonResponse::error('Unable to connect to database.', 'No connection could be made to the database');
+Helper::initDatabase();
 
 /**
  * Start routing

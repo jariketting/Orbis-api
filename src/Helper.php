@@ -28,4 +28,20 @@ class Helper
             error_reporting(E_ALL);
         }
     }
+
+    /**
+     * Initialize database connection
+     */
+    public static function initDatabase() : void {
+        $config = Config::getConfig(); //store config
+
+        //setup database
+        if(!Database::init(
+            $config['DATABASE']['host'],
+            $config['DATABASE']['db'],
+            $config['DATABASE']['user'],
+            $config['DATABASE']['passwd']
+        ))
+            JsonResponse::error('Unable to connect to database.', 'No connection could be made to the database');
+    }
 }
