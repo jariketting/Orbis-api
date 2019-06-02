@@ -24,4 +24,19 @@ class Post
 
         return ''; //return empty string on default
     }
+
+    /**
+     * Check if post param isset
+     *
+     * @param $name
+     *
+     * @return bool
+     */
+    static function exists($name) : bool {
+        //return false if post is not set
+        if(!isset($_POST)) return false;
+
+        //check if value exists
+        return isset($_POST[$name]);
+    }
 }
