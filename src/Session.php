@@ -1,7 +1,12 @@
 <?php
 namespace Orbis;
 
-
+/**
+ * Session model class
+ *
+ * Class Session
+ * @package Orbis
+ */
 class Session extends Model
 {
     /**
