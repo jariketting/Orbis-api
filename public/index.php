@@ -3,6 +3,7 @@ require_once '../vendor/autoload.php';
 use Orbis\Config;
 use Orbis\Database;
 use Orbis\JsonResponse;
+use Orbis\Router;
 
 $response = new JsonResponse(); //create response
 
@@ -29,7 +30,9 @@ if(!Database::init(
     $response->error('Unable to connect to database.', 'No connection could be made to the database');
 
 /**
- * Do stuff
+ * Start routing
  */
+if(!Router::getAction())
+    $response->error('No action given.', 'No action was provided in request.');
 
 $response->print();
