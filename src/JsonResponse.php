@@ -1,9 +1,12 @@
 <?php
-
-
 namespace Orbis;
 
-
+/**
+ * Creates json response
+ *
+ * Class JsonResponse
+ * @package Orbis
+ */
 class JsonResponse
 {
     /*
