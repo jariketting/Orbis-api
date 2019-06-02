@@ -52,19 +52,19 @@ class User extends Model
         $id = Router::getIdentifier();
 
         if(!$id) JsonResponse::error('No identifier given', '', 400);
-        else JsonResponse::setData(new User($id));
+
+        JsonResponse::setData(new User($id));
     }
 
     private static function updateRequest() {
         $id = Router::getIdentifier();
 
+        if(!$id) JsonResponse::error('No identifier given', '', 400);
+
         $user = new User($id);
         $user->update();
         $user->bindFields();
 
-        if(!$id)
-            JsonResponse::error('No identifier given', '', 400);
-        else
-            JsonResponse::setData($user);
+        JsonResponse::setData($user);
     }
 }
