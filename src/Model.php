@@ -74,9 +74,9 @@ abstract class Model
             $values[':'.$field] = $value; // save the placeholder
         }
 
-        $query = substr($query, 0, -1).';'; // remove last , and add a ;
+        $query = substr($query, 0, -1); // remove last , and add a ;
 
-        $query .= ' WHERE id = :id LIMIT 1';
+        $query .= ' WHERE id = :id LIMIT 1;';
         $values[':id'] = $this->_fields->id;
 
         $execute = Database::get()->prepare($query);
