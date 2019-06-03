@@ -1,6 +1,8 @@
 <?php
 namespace Orbis;
 
+use PDO;
+
 /**
  * Class User
  * @package Orbis
@@ -83,7 +85,7 @@ class User extends Model
      */
     private static function updateRequest() {
         $user = Session::getUser();
-        $user->update(['id', 'password']);
+        $user->update();
         $user->bindFields();
 
         JsonResponse::setData($user);
@@ -110,5 +112,67 @@ class User extends Model
         $user->session_id = Session::create($user->id);
 
         JsonResponse::setData($user);
+    }
+
+    /**
+     * Reset password
+     */
+    public static function resetPassword() : void {
+        if(!Post::exists('email'))
+            JsonResponse::error('Email missing', '', 400);
+
+        $email = Post::get('email');
+
+        $query = Database::get()->prepare('
+            SELECT id
+            FROM user
+            WHERE email = :email
+            LIMIT 1
+        ');
+        $query->bindParam(':email', $email);
+        $query->execute();
+
+        if(!$query)
+            JsonResponse::error();
+        else
+            $id = $query->fetch(PDO::FETCH_OBJ)->id;
+
+        if(!$id)
+            JsonResponse::error('No user found with that email', '', 404);
+        else {
+            $newPassword = Password::generate(10);
+            $encryptedPassword = Password::encrypt($newPassword);
+
+            $query = Database::get()->prepare('
+                UPDATE user
+                SET password = :password
+                WHERE id = :id
+                LIMIT 1
+            ');
+            $query->bindParam(':id', $id, PDO::PARAM_INT);
+            $query->bindParam(':password', $encryptedPassword, PDO::PARAM_STR);
+            $result = $query->execute();
+
+            if(!$result)
+                JsonResponse::error('Could not update password');
+            else {
+                $query = Database::get()->prepare('
+                    DELETE FROM session 
+                    WHERE user_id = :user_id
+                ');
+                $query->bindParam(':user_id', $id, PDO::PARAM_INT);
+                $query->execute();
+
+                $user = new User($id);
+
+                $msg = "Your new password is:\n";
+                $msg .= $newPassword;
+                $msg = wordwrap($msg, 70);
+
+                $headers = "From: orbis@jariketting.com" . "\r\n";
+
+                mail($user->email, "Orbis: new password", $msg, $headers);
+            }
+        }
     }
 }
