@@ -78,4 +78,29 @@ class Session
 
         JsonResponse::setData($data); //set data to created return data
     }
+
+    /**
+     * @param int $userId
+     *
+     * @return string
+     */
+    public static function create(int $userId) : string {
+        session_start();
+        $id = session_id();
+
+        $query = Database::get()->prepare('
+            INSERT INTO session 
+            SET id = :session_id, 
+                user_id = :user_id
+        ');
+        $query->bindParam(':session_id', $id, PDO::PARAM_STR);
+        $query->bindParam(':user_id', $userId, PDO::PARAM_INT);
+
+        if($query->execute())
+            return $id;
+        else {
+            JsonResponse::error('Could not create session', '');
+            return '';
+        }
+    }
 }
