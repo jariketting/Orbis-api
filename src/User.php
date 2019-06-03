@@ -21,12 +21,13 @@ class User extends Model
     /**
      * User constructor.
      *
-     * @param string $id
+     * @param int $id
      */
-    public function __construct(string $id) {
+    public function __construct(int $id) {
         parent::__construct(self::MODEL, $id);
 
-        $this->bindFields();
+        if($id > 0)
+            $this->bindFields();
     }
 
     /**
@@ -54,6 +55,9 @@ class User extends Model
             case 'update':
                 self::updateRequest();
                 break;
+            case 'add':
+                self::addRequest();
+                break;
             default:
                 JsonResponse::error('Invalid action', 'An invalid action was given', 400);
         }
@@ -78,11 +82,23 @@ class User extends Model
      * Handler for update request
      */
     private static function updateRequest() {
-        if(Router::getIdentifier())
-            JsonResponse::error('Can only update current user', 'You\'re only allowed to update your own user.', 403);
-
         $user = Session::getUser();
         $user->update(['id', 'password']);
+        $user->bindFields();
+
+        JsonResponse::setData($user);
+    }
+
+    /**
+     * Registration of new user
+     */
+    private static function addRequest() {
+        //only allow register when user not logged in
+        if(Post::get('session_id'))
+            JsonResponse::error('Can not register when logged in', 'You can not register a new account when logged in.', 403);
+
+        $user = new User(0);
+        $user->create();
         $user->bindFields();
 
         JsonResponse::setData($user);

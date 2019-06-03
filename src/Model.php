@@ -1,6 +1,7 @@
 <?php
 namespace Orbis;
 
+use Exception;
 use PDO;
 
 /**
@@ -22,24 +23,27 @@ abstract class Model
     public function __construct(string $model, string $id) {
         $this->_model = $model; //store model
 
-        //build query
-        $query = Database::get()->prepare('
-            SELECT * 
-            FROM  '.$model.'
-            WHERE id = :id
-            LIMIT 1
-        ');
-        $query->bindParam(':id', $id, PDO::PARAM_INT); //bind id of model
-        $query->execute(); //execute query
+        if($id > 0) {
 
-        //if query was unsuccessful return error
-        if(!$query) JsonResponse::error();
-        else {
-            $this->_fields = $query->fetch(PDO::FETCH_OBJ); //store db fields in fields
+            //build query
+            $query = Database::get()->prepare('
+                SELECT * 
+                FROM  '.$model.'
+                WHERE id = :id
+                LIMIT 1
+            ');
+            $query->bindParam(':id', $id, PDO::PARAM_INT); //bind id of model
+            $query->execute(); //execute query
 
-            //if field are empty give an error
-            if(!$this->_fields)
-                JsonResponse::error( ucfirst($model).' not found', '', 404);
+            //if query was unsuccessful return error
+            if(!$query) JsonResponse::error();
+            else {
+                $this->_fields = $query->fetch(PDO::FETCH_OBJ); //store db fields in fields
+
+                //if field are empty give an error
+                if(!$this->_fields)
+                    JsonResponse::error( ucfirst($model).' not found', '', 404);
+            }
         }
     }
 
@@ -47,6 +51,21 @@ abstract class Model
      * Bind fields
      */
     abstract protected function bindFields() : void;
+
+    /**
+     * Gets fields from table
+     */
+    protected function getFields() : void {
+        $query = Database::get()->query('DESCRIBE '.$this->_model);
+        $structure = $query->fetchAll(PDO::FETCH_OBJ);
+
+        $this->_fields = new \stdClass();
+
+        foreach($structure as $item) {
+            $field = $item->Field;
+            $this->_fields->{$field} = null;
+        }
+    }
 
     /**
      * Update database fields
@@ -68,7 +87,7 @@ abstract class Model
         $values = [];
 
         foreach ($this->_fields as $field => $value) {
-            if($field == 'id') continue; //skip id
+            if(in_array($field, $blacklist)) continue; //skip items in blacklist
 
             $query .= ' '.$field.' = :'.$field.','; // the :$name part is the placeholder, e.g. :zip
             $values[':'.$field] = $value; // save the placeholder
@@ -80,6 +99,56 @@ abstract class Model
         $values[':id'] = $this->_fields->id;
 
         $execute = Database::get()->prepare($query);
-        return $execute->execute($values);
+
+        try {
+            $result = $execute->execute($values);
+        } catch (Exception $e) {
+            JsonResponse::error('Could not create '.$this->_model, $e->getMessage(), 500);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $blacklist
+     *
+     * @return bool
+     */
+    protected function create(array $blacklist = ['id']) {
+        $this->getFields();
+
+        foreach ($this->_fields as $field => $value) {
+            if(in_array($field, $blacklist)) continue; //skip items in blacklist
+
+            //check if value is given in post
+            if(Post::exists($field))
+                $this->_fields->$field = Post::get($field);
+            else
+                JsonResponse::error('Missing field '.$field, '', 400);
+        }
+
+        $query = 'INSERT INTO '.$this->_model. ' SET';
+        $values = [];
+
+        foreach ($this->_fields as $field => $value) {
+            if(in_array($field, $blacklist)) continue; //skip items in blacklist
+
+            $query .= ' '.$field.' = :'.$field.','; // the :$name part is the placeholder, e.g. :zip
+            $values[':'.$field] = $value; // save the placeholder
+        }
+
+        $query = substr($query, 0, -1); // remove last , and add a ;
+
+        $execute = Database::get()->prepare($query);
+
+        try {
+            $result = $execute->execute($values);
+        } catch (Exception $e) {
+            JsonResponse::error('Could not create '.$this->_model, $e->getMessage(), 500);
+        }
+
+        $this->_fields->id = Database::get()->lastInsertId();
+
+        return $result;
     }
 }
