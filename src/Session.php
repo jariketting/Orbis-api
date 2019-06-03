@@ -11,28 +11,29 @@ use PDO;
  */
 class Session
 {
-    //database fields
-    public  $id,
-            $user_id;
+    public static function getUser() : User {
+        $sessionId = Post::get('session_id'); //get session id from post
 
-    public function __construct(string $id) {
+        //give error when no session id is given
+        if(!$sessionId)
+            JsonResponse::error('Session id not given.', '"session_id" is missing in post data.', 400);
+
         $query = Database::get()->prepare('
-            SELECT * 
-            FROM session 
+            SELECT user_id
+            FROM session
             WHERE id = :id
-            LIMIT 1
+            LIMIT 1;
         ');
-        $query->bindParam(':id', $id, PDO::PARAM_STR);
+        $query->bindParam(':id', $sessionId);
         $query->execute();
 
-        if(!$query)
-            JsonResponse::error('Session not found', 'The session id was invalid or not found.', 404);
-        else {
-            $session = $query->fetch(PDO::FETCH_OBJ);
+        //check if query was executed successful
+        if($query)
+            $userId = $query->fetch(PDO::FETCH_OBJ)->user_id; //get count from query data
+        else
+            JsonResponse::error('Current user not found', '', 404); //something went wrong
 
-            $this->id       = (string)$session->id;
-            $this->user_id  = (int)$session->user_id;
-        }
+        return new User($userId);
     }
 
     /**
