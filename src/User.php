@@ -18,13 +18,21 @@ class User extends Model
             $bio,
             $image_id;
 
+    /**
+     * User constructor.
+     *
+     * @param string $id
+     */
     public function __construct(string $id) {
         parent::__construct(self::MODEL, $id);
 
         $this->bindFields();
     }
 
-    protected function bindFields() {
+    /**
+     * Bind fields
+     */
+    protected function bindFields() : void {
         $this->id = (int)$this->_fields->id;
         $this->username = (string)$this->_fields->username;
         $this->email = (string)$this->_fields->email;
@@ -35,7 +43,10 @@ class User extends Model
         $this->image_id = (int)$this->_fields->image_id;
     }
 
-    public static function request() {
+    /**
+     * Request handler
+     */
+    public static function request() : void {
         switch (Router::getAction()) {
             case 'get':
                 self::getRequest();
@@ -48,21 +59,30 @@ class User extends Model
         }
     }
 
-    private static function getRequest() {
+    /**
+     * handler for get request
+     */
+    private static function getRequest() : void {
         $id = Router::getIdentifier();
 
-        if(!$id) JsonResponse::error('No identifier given', '', 400);
+        //if id not given, return current logged in user
+        if(!$id)
+            $user = Session::getUser();
+        else
+            $user = new User($id);
 
-        JsonResponse::setData(new User($id));
+        JsonResponse::setData($user);
     }
 
+    /**
+     * Handler for update request
+     */
     private static function updateRequest() {
-        $id = Router::getIdentifier();
+        if(Router::getIdentifier())
+            JsonResponse::error('Can only update current user', 'You\'re only allowed to update your own user.', 403);
 
-        if(!$id) JsonResponse::error('No identifier given', '', 400);
-
-        $user = new User($id);
-        $user->update();
+        $user = Session::getUser();
+        $user->update(['id', 'password']);
         $user->bindFields();
 
         JsonResponse::setData($user);
