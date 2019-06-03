@@ -174,7 +174,9 @@ class User extends Model
                 $msg .= $newPassword;
                 $msg = wordwrap($msg, 70);
 
-                mail($user->email, "Orbis: new password", $msg);
+                $headers = "From: orbis@jariketting.com" . "\r\n";
+
+                mail($user->email, "Orbis: new password", $msg, $headers);
             }
         }
     }
