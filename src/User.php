@@ -93,6 +93,7 @@ class User extends Model
      * Registration of new user
      */
     private static function addRequest() {
+
         //only allow register when user not logged in
         if(Post::get('session_id'))
             JsonResponse::error('Can not register when logged in', 'You can not register a new account when logged in.', 403);
@@ -105,6 +106,8 @@ class User extends Model
         $user = new User(0);
         $user->create();
         $user->bindFields();
+
+        $user->session_id = Session::create($user->id);
 
         JsonResponse::setData($user);
     }
