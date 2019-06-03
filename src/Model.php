@@ -1,37 +1,52 @@
 <?php
 namespace Orbis;
 
-
 use PDO;
 
+/**
+ * Class Model
+ * @package Orbis
+ */
 abstract class Model
 {
-    protected $_fields;
+    protected $_fields; //store model fields
 
-    private $_model;
+    private $_model; //store model name
 
+    /**
+     * Model constructor.
+     *
+     * @param string $model
+     * @param string $id
+     */
     public function __construct(string $model, string $id) {
-        $this->_model = $model;
+        $this->_model = $model; //store model
 
+        //build query
         $query = Database::get()->prepare('
             SELECT * 
             FROM  '.$model.'
             WHERE id = :id
             LIMIT 1
         ');
-        $query->bindParam(':id', $id, PDO::PARAM_INT);
-        $query->execute();
+        $query->bindParam(':id', $id, PDO::PARAM_INT); //bind id of model
+        $query->execute(); //execute query
 
+        //if query was unsuccessful return error
         if(!$query) JsonResponse::error();
         else {
-            $this->_fields = $query->fetch(PDO::FETCH_OBJ);
+            $this->_fields = $query->fetch(PDO::FETCH_OBJ); //store db fields in fields
 
+            //if field are empty give an error
             if(!$this->_fields)
                 JsonResponse::error( ucfirst($model).' not found', '', 404);
         }
     }
 
-    abstract protected function bindFields();
+    /**
+     * Bind fields
+     */
+    abstract protected function bindFields() : void;
 
     /**
      * Update database fields
