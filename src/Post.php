@@ -16,13 +16,22 @@ class Post
      *
      * @return string
      */
-    static function get($name) {
+    static function get(string $name) : string {
         //validate post
         if(isset($_POST))
             if(isset($_POST[$name]))
                 return $_POST[$name]; //return post param
 
         return ''; //return empty string on default
+    }
+
+    static function overwrite(string $name, string $newValue) : bool {
+        if(!self::exists($name))
+            return false;
+
+        $_POST[$name] = $newValue;
+
+        return true;
     }
 
     /**
@@ -32,7 +41,7 @@ class Post
      *
      * @return bool
      */
-    static function exists($name) : bool {
+    static function exists(string $name) : bool {
         //return false if post is not set
         if(!isset($_POST)) return false;
 
