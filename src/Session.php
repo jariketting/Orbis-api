@@ -85,8 +85,7 @@ class Session
      * @return string
      */
     public static function create(int $userId) : string {
-        session_start();
-        $id = session_id();
+        $id = session_create_id();
 
         $query = Database::get()->prepare('
             INSERT INTO session 
@@ -102,5 +101,64 @@ class Session
             JsonResponse::error('Could not create session', '');
             return '';
         }
+    }
+
+    /**
+     * Login with username and password
+     */
+    public static function login() : void {
+        if(!Post::exists('email') || !Post::exists('password'))
+            JsonResponse::error('Email or password missing', '', 400);
+
+        $email = Post::get('email');
+        $password = Post::get('password');
+
+        $query = Database::get()->prepare('
+            SELECT id, password
+            FROM user
+            WHERE email = :email
+            LIMIT 1
+        ');
+        $query->bindParam(':email', $email);
+        $query->execute();
+
+        if(!$query)
+            JsonResponse::error();
+        else
+            $user = $query->fetch(PDO::FETCH_OBJ);
+
+        if(!$user)
+            JsonResponse::error('No user found with that email', '', 404);
+        else {
+            if(!Password::verify($password, $user->password))
+                JsonResponse::error('Wrong password', '', 401);
+            else {
+                $user = new User($user->id);
+                $user->session_id = self::create($user->id);
+
+                JsonResponse::setData($user);
+            }
+        }
+    }
+
+    /**
+     * Logout
+     */
+    public static function logout() : void {
+        if(!Post::exists('session_id'))
+            JsonResponse::error('Session id not given', '', 400);
+
+        $id = Post::get('session_id');
+
+        $query = Database::get()->prepare('
+            DELETE FROM session 
+            WHERE id = :id 
+            LIMIT 1
+        ');
+        $query->bindParam(':id', $id, PDO::PARAM_STR);
+        $result = $query->execute();
+
+        if(!$result)
+            JsonResponse::error('Could not log out', '', 500);
     }
 }

@@ -20,9 +20,16 @@ switch (Router::getType()) {
     case 'validate_session':
         Session::validate();
         break;
+    case 'login':
+        Session::login();
+        break;
+    case 'logout':
+        Session::logout();
+        break;
     case 'user';
         User::request();
         break;
+
     default:
         JsonResponse::error('Invalid type given', 'A type was provided but seems to be invalid', 400);
         break;
