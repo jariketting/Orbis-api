@@ -97,6 +97,11 @@ class User extends Model
         if(Post::get('session_id'))
             JsonResponse::error('Can not register when logged in', 'You can not register a new account when logged in.', 403);
 
+        //TODO validate password
+        $password = Post::get('password');
+        if($password)
+            Post::overwrite('password', Password::encrypt($password));
+
         $user = new User(0);
         $user->create();
         $user->bindFields();
