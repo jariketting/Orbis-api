@@ -85,6 +85,12 @@ class User extends Model
      */
     private static function updateRequest() {
         $user = Session::getUser();
+
+        //overwrite password with encrypted
+        $password = Post::get('password');
+        if($password)
+            Post::overwrite('password', Password::encrypt($password));
+
         $user->update();
         $user->bindFields();
 
@@ -95,7 +101,6 @@ class User extends Model
      * Registration of new user
      */
     private static function addRequest() {
-
         //only allow register when user not logged in
         if(Post::get('session_id'))
             JsonResponse::error('Can not register when logged in', 'You can not register a new account when logged in.', 403);
@@ -169,9 +174,7 @@ class User extends Model
                 $msg .= $newPassword;
                 $msg = wordwrap($msg, 70);
 
-                $headers = "From: orbis@jariketting.com" . "\r\n";
-
-                mail($user->email, "Orbis: new password", $msg, $headers);
+                mail($user->email, "Orbis: new password", $msg);
             }
         }
     }
