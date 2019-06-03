@@ -26,6 +26,9 @@ switch (Router::getType()) {
     case 'logout':
         Session::logout();
         break;
+    case 'reset_password':
+        User::resetPassword();
+        break;
     case 'user';
         User::request();
         break;
