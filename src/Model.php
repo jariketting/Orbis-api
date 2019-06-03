@@ -50,10 +50,14 @@ abstract class Model
 
     /**
      * Update database fields
+     *
+     * @param array $blacklist
+     *
+     * @return bool
      */
-    protected function update() : bool {
+    protected function update(array $blacklist = ['id']) : bool {
         foreach ($this->_fields as $field => $value) {
-            if($field == 'id') continue; //skip id
+            if(in_array($field, $blacklist)) continue; //skip items in blacklist
 
             //check if value is given in post
             if(Post::exists($field))
