@@ -16,6 +16,7 @@ Helper::initDatabase();
 if(!Router::getType())
     JsonResponse::error('No type given.', 'No type was provided in request.', 400);
 
+//handle requests
 switch (Router::getType()) {
     case 'validate_session':
         Session::validate();
@@ -38,4 +39,5 @@ switch (Router::getType()) {
         break;
 }
 
+//print response
 JsonResponse::print();

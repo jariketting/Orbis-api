@@ -56,14 +56,16 @@ abstract class Model
      * Gets fields from table
      */
     protected function getFields() : void {
+        //get table structure from database
         $query = Database::get()->query('DESCRIBE '.$this->_model);
         $structure = $query->fetchAll(PDO::FETCH_OBJ);
 
-        $this->_fields = new \stdClass();
+        $this->_fields = new \stdClass(); //prevents error
 
+        //assign each item to the fields
         foreach($structure as $item) {
             $field = $item->Field;
-            $this->_fields->{$field} = null;
+            $this->_fields->{$field} = null; //default value is null
         }
     }
 
@@ -80,12 +82,15 @@ abstract class Model
 
             //check if value is given in post
             if(Post::exists($field))
-                $this->_fields->$field = Post::get($field);
+                $this->_fields->$field = Post::get($field); //assign new value
         }
 
+        //build query
         $query = 'UPDATE ' . $this->_model . ' SET';
-        $values = [];
 
+        $values = []; //store values to update
+
+        //go trough each field and build query and set values
         foreach ($this->_fields as $field => $value) {
             if(in_array($field, $blacklist)) continue; //skip items in blacklist
 
