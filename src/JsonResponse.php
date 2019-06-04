@@ -65,12 +65,13 @@ class JsonResponse
                 'title'     => self::$_errorTitle,
                 'detail'    => self::$_errorDetail
             ],
+            'response_code' => self::$_responseCode,
             'data' => self::$_data
         ], JSON_FORCE_OBJECT);
 
         //set header and response code
         header('Content-Type: application/json');
-        http_response_code(self::$_responseCode);
+        //http_response_code(self::$_responseCode);
 
         echo $json; //print generated json to screen
 
