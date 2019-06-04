@@ -61,6 +61,9 @@ class User extends Model
             case 'add':
                 self::addRequest();
                 break;
+            case 'delete':
+                self::deleteRequest();
+                break;
             default:
                 JsonResponse::error('Invalid action', 'An invalid action was given', 400);
         }
@@ -119,6 +122,18 @@ class User extends Model
         $user->session_id = Session::create($user->id); //log user in and send back session id.
 
         JsonResponse::setData($user);
+    }
+
+    /**
+     * Delete user request
+     */
+    private static function deleteRequest() {
+        //only allow delete when user  logged in
+        if(!Post::get('session_id'))
+            JsonResponse::error('Can only delete when logged in', '', 403);
+
+        $user = Session::getUser();
+        $user->delete();
     }
 
     /**

@@ -26,6 +26,7 @@ abstract class Model
         if($id > 0) {
 
             //build query
+            /** @noinspection SqlResolve */
             $query = Database::get()->prepare('
                 SELECT * 
                 FROM  '.$model.'
@@ -155,5 +156,25 @@ abstract class Model
         $this->_fields->id = Database::get()->lastInsertId();
 
         return $result;
+    }
+
+    /**
+     * Delete from database
+     */
+    protected function delete() {
+        $id = $this->_fields->id;
+
+        if(!$id)
+            JsonResponse::error('Id not found', '', 400);
+
+        //build query
+        /** @noinspection SqlResolve */$query = Database::get()->prepare('
+                DELETE 
+                FROM  '.$this->_model.'
+                WHERE id = :id
+                LIMIT 1
+            ');
+        $query->bindParam(':id', $id, PDO::PARAM_INT); //bind id of model
+        $query->execute(); //execute query
     }
 }
