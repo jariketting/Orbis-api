@@ -18,6 +18,8 @@ class Post
         $contentType = isset($_SERVER["CONTENT_TYPE"]) ? trim($_SERVER["CONTENT_TYPE"]) : '';
         $contentType = strtolower($contentType);
 
+        var_dump($contentType);
+
         //Make sure that the content type of the POST request has been set to application/json
         if($contentType == 'application/json') {
 
