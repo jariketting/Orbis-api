@@ -66,6 +66,7 @@ class User extends Model
                 break;
             default:
                 JsonResponse::error('Invalid action', 'An invalid action was given', 400);
+                break;
         }
     }
 
