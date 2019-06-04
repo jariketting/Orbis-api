@@ -107,35 +107,43 @@ class Session
      * Login with username and password
      */
     public static function login() : void {
+        //check if email and password where set
         if(!Post::exists('email') || !Post::exists('password'))
             JsonResponse::error('Email or password missing', '', 400);
 
+        //get email and password
         $email = Post::get('email');
         $password = Post::get('password');
 
+        //build query to get password and user id by email
         $query = Database::get()->prepare('
             SELECT id, password
             FROM user
             WHERE email = :email
             LIMIT 1
         ');
-        $query->bindParam(':email', $email);
+        $query->bindParam(':email', $email); //bind email
         $query->execute();
 
+        //check if query was successful
         if(!$query)
             JsonResponse::error();
         else
             $user = $query->fetch(PDO::FETCH_OBJ);
 
+        //check if user was found
         if(!$user)
             JsonResponse::error('No user found with that email', '', 404);
         else {
+            //verify password
             if(!Password::verify($password, $user->password))
-                JsonResponse::error('Wrong password', '', 401);
+                JsonResponse::error('Wrong password', '', 401); //wrong password
             else {
+                //get user with logged in user id
                 $user = new User($user->id);
-                $user->session_id = self::create($user->id);
+                $user->session_id = self::create($user->id); //create new sessions and add to data
 
+                //send logged in user back
                 JsonResponse::setData($user);
             }
         }
@@ -145,11 +153,14 @@ class Session
      * Logout
      */
     public static function logout() : void {
+        //check if session id is given
         if(!Post::exists('session_id'))
             JsonResponse::error('Session id not given', '', 400);
 
+        //get session id
         $id = Post::get('session_id');
 
+        //build query to delete any session
         $query = Database::get()->prepare('
             DELETE FROM session 
             WHERE id = :id 
@@ -158,6 +169,7 @@ class Session
         $query->bindParam(':id', $id, PDO::PARAM_STR);
         $result = $query->execute();
 
+        //check if successful logout
         if(!$result)
             JsonResponse::error('Could not log out', '', 500);
     }
