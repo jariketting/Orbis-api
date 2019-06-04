@@ -27,13 +27,15 @@ class Session
         $query->bindParam(':id', $sessionId);
         $query->execute();
 
-        //check if query was executed successful
-        if($query)
-            $userId = $query->fetch(PDO::FETCH_OBJ)->user_id; //get count from query data
-        else
+        if(!$query)
             JsonResponse::error('Current user not found', '', 404); //something went wrong
 
-        return new User($userId);
+        $user = (object)$query->fetch(PDO::FETCH_OBJ);
+
+        if(!isset($user->user_id))
+            JsonResponse::error('User not found or logged in', '', 404);
+
+        return new User($user->user_id);
     }
 
     /**
