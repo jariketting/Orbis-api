@@ -21,7 +21,7 @@ class Post
         JsonResponse::error($contentType);
 
         //Make sure that the content type of the POST request has been set to application/json
-        if($contentType == 'application/json') {
+        if(strpos($contentType, 'application/json') !== false) {
 
             //Receive the RAW post data.
             $content = trim(file_get_contents("php://input"));
