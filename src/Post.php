@@ -12,6 +12,26 @@ namespace Orbis;
 class Post
 {
     /**
+     * Initialize post
+     */
+    static function init() : void {
+        $contentType = isset($_SERVER["CONTENT_TYPE"]) ? trim($_SERVER["CONTENT_TYPE"]) : '';
+        $contentType = strtolower($contentType);
+
+        //Make sure that the content type of the POST request has been set to application/json
+        if($contentType == 'application/json') {
+
+            //Receive the RAW post data.
+            $content = trim(file_get_contents("php://input"));
+
+            $content = json_decode($content, JSON_OBJECT_AS_ARRAY);
+
+            if (json_last_error() === JSON_ERROR_NONE)
+                $_POST = $content;
+        }
+    }
+
+    /**
      * @param $name
      *
      * @return string

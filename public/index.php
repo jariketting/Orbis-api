@@ -3,12 +3,14 @@ require_once '../vendor/autoload.php';
 
 use Orbis\Helper;
 use Orbis\JsonResponse;
+use Orbis\Post;
 use Orbis\Router;
 use Orbis\Session;
 use Orbis\User;
 
 Helper::initConfig();
 Helper::initDatabase();
+Post::Init();
 
 /**
  * Start routing
