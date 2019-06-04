@@ -28,6 +28,7 @@ class User extends Model
     public function __construct(int $id) {
         parent::__construct(self::MODEL, $id);
 
+        //only bind fields if user id is given, 0 means new user
         if($id > 0)
             $this->bindFields();
     }
@@ -91,10 +92,10 @@ class User extends Model
         if($password)
             Post::overwrite('password', Password::encrypt($password));
 
-        $user->update();
-        $user->bindFields();
+        $user->update(); //update user data
+        $user->bindFields(); //rebind fields
 
-        JsonResponse::setData($user);
+        JsonResponse::setData($user); //send new user data back
     }
 
     /**
@@ -110,11 +111,12 @@ class User extends Model
         if($password)
             Post::overwrite('password', Password::encrypt($password));
 
+        //create new user
         $user = new User(0);
-        $user->create();
-        $user->bindFields();
+        $user->create(); //create user
+        $user->bindFields(); //bind fields
 
-        $user->session_id = Session::create($user->id);
+        $user->session_id = Session::create($user->id); //log user in and send back session id.
 
         JsonResponse::setData($user);
     }
@@ -123,10 +125,11 @@ class User extends Model
      * Reset password
      */
     public static function resetPassword() : void {
+        //check if email is given
         if(!Post::exists('email'))
             JsonResponse::error('Email missing', '', 400);
 
-        $email = Post::get('email');
+        $email = Post::get('email'); //get email
 
         $query = Database::get()->prepare('
             SELECT id
@@ -137,17 +140,21 @@ class User extends Model
         $query->bindParam(':email', $email);
         $query->execute();
 
+        //check if query is correct
         if(!$query)
             JsonResponse::error();
         else
-            $id = $query->fetch(PDO::FETCH_OBJ)->id;
+            $id = $query->fetch(PDO::FETCH_OBJ)->id; //extract id
 
+        //check if id is found
         if(!$id)
             JsonResponse::error('No user found with that email', '', 404);
         else {
+            //generate a password
             $newPassword = Password::generate(10);
             $encryptedPassword = Password::encrypt($newPassword);
 
+            //build query to update password
             $query = Database::get()->prepare('
                 UPDATE user
                 SET password = :password
@@ -158,9 +165,11 @@ class User extends Model
             $query->bindParam(':password', $encryptedPassword, PDO::PARAM_STR);
             $result = $query->execute();
 
+            //check if reset was successful
             if(!$result)
                 JsonResponse::error('Could not update password');
             else {
+                //delete any sessions
                 $query = Database::get()->prepare('
                     DELETE FROM session 
                     WHERE user_id = :user_id
@@ -168,14 +177,18 @@ class User extends Model
                 $query->bindParam(':user_id', $id, PDO::PARAM_INT);
                 $query->execute();
 
+                //get user
                 $user = new User($id);
 
+                //build email
                 $msg = "Your new password is:\n";
                 $msg .= $newPassword;
-                $msg = wordwrap($msg, 70);
+                $msg = wordwrap($msg, 70); //wrap content for mailing
 
+                //set headers
                 $headers = "From: orbis@jariketting.com" . "\r\n";
 
+                //send email
                 mail($user->email, "Orbis: new password", $msg, $headers);
             }
         }
