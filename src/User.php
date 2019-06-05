@@ -165,6 +165,44 @@ class User extends Model
         return new Memory($id);
     }
 
+    public static function search() {
+        if(!Post::exists('search'))
+            JsonResponse::error('Search string not provided', '', 400);
+
+        $search = Post::get('search');
+        $user = Session::getUser();
+
+        $users = [];
+
+        $query = Database::get()->prepare('
+            SELECT id
+            FROM user
+            WHERE id != :user_id
+            AND (username LIKE \'%'.$search.'%\' OR name LIKE \'%'.$search.'%\')
+        ');
+        $query->bindParam(':user_id', $user->id, PDO::PARAM_INT);
+        $query->execute();
+
+        if(!$query)
+            JsonResponse::error();
+        else
+            $userIds = $query->fetchAll(PDO::FETCH_OBJ);
+
+        if(!$userIds)
+            JsonResponse::error('No users found', '', 404);
+
+        foreach ($userIds as $userId) {
+            $user = new User($userId->id);
+            unset($user->email);
+            unset($user->notifications);
+            unset($user->private);
+            unset($user->bio);
+            $users[] = $user;
+        }
+
+        JsonResponse::setData($users);
+    }
+
     /**
      * Reset password
      */

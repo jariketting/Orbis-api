@@ -44,6 +44,9 @@ switch (Router::getType()) {
     case 'user';
         User::request();
         break;
+    case 'search_user';
+        User::search();
+        break;
     case 'memory';
         Memory::request();
         break;
