@@ -54,6 +54,9 @@ switch (Router::getType()) {
     case 'unfollow':
         Follow::unfollow();
         break;
+    case 'get_followers':
+        Follow::getFollowers();
+        break;
     case 'memory':
         Memory::request();
         break;
