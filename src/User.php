@@ -51,17 +51,23 @@ class User extends Model
      * Request handler
      */
     public static function request() : void {
+        $sessionId = Post::exists('session_id');
+
         switch (Router::getAction()) {
             case 'get':
+                if(!$sessionId) JsonResponse::error('Session id required', 'Session id is missing in post data', 403);
                 self::getRequest();
                 break;
             case 'update':
+                if(!$sessionId) JsonResponse::error('Session id required', 'Session id is missing in post data', 403);
                 self::updateRequest();
                 break;
             case 'add':
+                if($sessionId) JsonResponse::error('Cannot register when logged in', '', 403);
                 self::addRequest();
                 break;
             case 'delete':
+                if(!$sessionId) JsonResponse::error('Session id required', 'Session id is missing in post data', 403);
                 self::deleteRequest();
                 break;
             default:
@@ -74,10 +80,6 @@ class User extends Model
      * handler for get request
      */
     private static function getRequest() : void {
-        //only allow register when user not logged in
-        if(Post::get('session_id'))
-            JsonResponse::error('You need to be logged in', '', 403);
-
         $id = Router::getIdentifier();
 
         //if id not given, return current logged in user
@@ -110,10 +112,6 @@ class User extends Model
      * Registration of new user
      */
     private static function addRequest() {
-        //only allow register when user not logged in
-        if(Post::get('session_id'))
-            JsonResponse::error('Can not register when logged in', 'You can not register a new account when logged in.', 403);
-
         //TODO validate password
         $password = Post::get('password');
         if($password)
@@ -133,10 +131,6 @@ class User extends Model
      * Delete user request
      */
     private static function deleteRequest() {
-        //only allow delete when user  logged in
-        if(!Post::get('session_id'))
-            JsonResponse::error('Can only delete when logged in', '', 403);
-
         $user = Session::getUser();
         $user->delete();
     }
