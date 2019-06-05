@@ -85,7 +85,20 @@ class Memory extends Model {
     }
 
     private static function updateRequest() : void {
+        $id = Router::getIdentifier();
 
+        $memory = new Memory($id);
+
+        if(!$memory->id)
+            JsonResponse::error('Memory not found', 'Could not find this memory', 404);
+
+        if(!$memory->user_id == Session::getUser()->id)
+            JsonResponse::error('Can only delete own memories','You can not delete others memories!', 400);
+
+        $memory->update();
+        $memory->bindFields(); //rebind fields
+
+        JsonResponse::setData($memory); //send new memory data back
     }
 
     private static function addRequest() : void {
