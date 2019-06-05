@@ -44,10 +44,16 @@ switch (Router::getType()) {
     case 'user';
         User::request();
         break;
-    case 'search_user';
+    case 'search_user':
         User::search();
         break;
-    case 'memory';
+    case 'follow':
+        User::follow();
+        break;
+    case 'unfollow':
+        User::unfollow();
+        break;
+    case 'memory':
         Memory::request();
         break;
     default:
