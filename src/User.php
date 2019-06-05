@@ -74,6 +74,10 @@ class User extends Model
      * handler for get request
      */
     private static function getRequest() : void {
+        //only allow register when user not logged in
+        if(Post::get('session_id'))
+            JsonResponse::error('You need to be logged in', '', 403);
+
         $id = Router::getIdentifier();
 
         //if id not given, return current logged in user
