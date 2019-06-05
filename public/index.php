@@ -3,6 +3,7 @@ require_once '../vendor/autoload.php';
 
 use Orbis\Helper;
 use Orbis\JsonResponse;
+use Orbis\Memory;
 use Orbis\Post;
 use Orbis\Router;
 use Orbis\Session;
@@ -35,7 +36,9 @@ switch (Router::getType()) {
     case 'user';
         User::request();
         break;
-
+    case 'memory';
+        Memory::request();
+        break;
     default:
         JsonResponse::error('Invalid type given', 'A type was provided but seems to be invalid', 400);
         break;
