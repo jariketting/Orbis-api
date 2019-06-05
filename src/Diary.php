@@ -27,6 +27,9 @@ class Diary
 
         foreach ($memoryIds as $memoryId) {
             $memory = new Memory($memoryId->id);
+            unset($memory->user_id);
+            unset($memory->longitude);
+            unset($memory->latitude);
             $memories[] = $memory;
         }
 
