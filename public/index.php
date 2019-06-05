@@ -2,6 +2,7 @@
 require_once '../vendor/autoload.php';
 
 use Orbis\Diary;
+use Orbis\Follow;
 use Orbis\Helper;
 use Orbis\JsonResponse;
 use Orbis\Map;
@@ -48,10 +49,10 @@ switch (Router::getType()) {
         User::search();
         break;
     case 'follow':
-        User::follow();
+        Follow::follow();
         break;
     case 'unfollow':
-        User::unfollow();
+        Follow::unfollow();
         break;
     case 'memory':
         Memory::request();
