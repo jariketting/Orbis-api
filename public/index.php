@@ -1,6 +1,7 @@
 <?php
 require_once '../vendor/autoload.php';
 
+use Orbis\Diary;
 use Orbis\Helper;
 use Orbis\JsonResponse;
 use Orbis\Map;
@@ -36,6 +37,9 @@ switch (Router::getType()) {
         break;
     case 'map':
         Map::get();
+        break;
+    case 'diary':
+        Diary::get();
         break;
     case 'user';
         User::request();
