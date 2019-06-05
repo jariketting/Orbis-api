@@ -55,15 +55,15 @@ class User extends Model
 
         switch (Router::getAction()) {
             case 'get':
-                if(!$sessionId) JsonResponse::error('Session id required', 'Session id is missing in post data', 403);
+                if(!$sessionId) self::sessionIdError();
                 self::getRequest();
                 break;
             case 'update':
-                if(!$sessionId) JsonResponse::error('Session id required', 'Session id is missing in post data', 403);
+                if(!$sessionId) self::sessionIdError();
                 self::updateRequest();
                 break;
             case 'add':
-                if($sessionId) JsonResponse::error('Cannot register when logged in', '', 403);
+                if($sessionId) self::sessionIdError();
                 self::addRequest();
                 break;
             case 'delete':
@@ -74,6 +74,13 @@ class User extends Model
                 JsonResponse::error('Invalid action', 'An invalid action was given', 400);
                 break;
         }
+    }
+
+    /**
+     * Error when session id missing
+     */
+    private static function sessionIdError() {
+        JsonResponse::error('Session id required', 'Session id is missing in post data', 403);
     }
 
     /**
