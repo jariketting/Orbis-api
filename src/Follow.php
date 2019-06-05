@@ -29,6 +29,7 @@ class Follow
             (user_id, following_id) 
             VALUES 
             (:user_id, :following_id)
+            ON DUPLICATE KEY UPDATE following_id = following_id
         ');
         $query->bindParam(':user_id', $user->id, PDO::PARAM_INT);
         $query->bindParam(':following_id', $followUser->id, PDO::PARAM_INT);
