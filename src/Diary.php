@@ -14,11 +14,12 @@ class Diary
      */
     public static function get() {
         $page = Post::get('page');
+        $order = Post::get('order');
 
         if(!$page) $page = 1;
 
         $user = Session::getUser();
-        $memoryIds = self::getMemoryIds($user->id, $page);
+        $memoryIds = self::getMemoryIds($user->id, $page, $order);
 
         $memories = [];
 
@@ -36,15 +37,27 @@ class Diary
         JsonResponse::setData($memories);
     }
 
-    private static function getMemoryIds(int $userId, int $page) : array {
+    private static function getMemoryIds(int $userId, int $page, string $order) : array {
         $memoryIds = [];
 
         $offset = (($page*10)-10);
+
+        switch ($order) {
+            case 'old':
+                $order = 'ASC';
+                break;
+            case 'new':
+                //fall trough
+            default:
+                $order = 'DESC';
+                break;
+        }
 
         $query = Database::get()->prepare('
             SELECT id
             FROM memory
             WHERE user_id = :user_id
+            ORDER BY datetime '.$order.'
             LIMIT :offset, 10
         ');
         $query->bindParam(':user_id', $userId, PDO::PARAM_INT);
