@@ -15,11 +15,12 @@ class Diary
     public static function get() {
         $page = Post::get('page');
         $order = Post::get('order');
+        $search = Post::get('search');
 
         if(!$page) $page = 1;
 
         $user = Session::getUser();
-        $memoryIds = self::getMemoryIds($user->id, $page, $order);
+        $memoryIds = self::getMemoryIds($user->id, $page, $order, $search);
 
         $memories = [];
 
@@ -37,7 +38,7 @@ class Diary
         JsonResponse::setData($memories);
     }
 
-    private static function getMemoryIds(int $userId, int $page, string $order) : array {
+    private static function getMemoryIds(int $userId, int $page, string $order, string $search) : array {
         $memoryIds = [];
 
         $offset = (($page*10)-10);
@@ -57,6 +58,7 @@ class Diary
             SELECT id
             FROM memory
             WHERE user_id = :user_id
+            '.(($search != '') ? 'AND title LIKE \'%'.$search.'%\'' : '').'
             ORDER BY datetime '.$order.'
             LIMIT :offset, 10
         ');
