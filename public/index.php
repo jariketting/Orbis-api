@@ -3,6 +3,7 @@ require_once '../vendor/autoload.php';
 
 use Orbis\Helper;
 use Orbis\JsonResponse;
+use Orbis\Map;
 use Orbis\Memory;
 use Orbis\Post;
 use Orbis\Router;
@@ -32,6 +33,9 @@ switch (Router::getType()) {
         break;
     case 'reset_password':
         User::resetPassword();
+        break;
+    case 'map':
+        Map::get();
         break;
     case 'user';
         User::request();
