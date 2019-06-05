@@ -142,6 +142,29 @@ class User extends Model
         $user->delete();
     }
 
+    public function getLatestMemory() : Memory {
+        $query = Database::get()->prepare('
+            SELECT id
+            FROM memory
+            WHERE user_id = :user_id
+            ORDER BY datetime DESC
+            LIMIT 1
+        ');
+        $query->bindParam(':user_id', $this->id, PDO::PARAM_INT);
+        $query->execute();
+
+        //check if query is correct
+        if(!$query)
+            JsonResponse::error();
+        else
+            $id = $query->fetch(PDO::FETCH_OBJ)->id; //extract id
+
+        if(!$id)
+            JsonResponse::error('User has no memories', '', 404);
+
+        return new Memory($id);
+    }
+
     /**
      * Reset password
      */
