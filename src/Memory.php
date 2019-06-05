@@ -69,13 +69,16 @@ class Memory extends Model {
         }
     }
 
+    /**
+     * Get memory request
+     */
     private static function getRequest() : void {
         $id = Router::getIdentifier();
 
         //if id not given, return latest memory
-        if(!$id)
-            exit();//$user = Session::getUser();
-        else
+        if(!$id) {
+            $memory = Session::getUser()->getLatestMemory();
+        } else
             $memory = new Memory($id);
 
         JsonResponse::setData($memory);
