@@ -45,13 +45,8 @@ class Post
         return ''; //return empty string on default
     }
 
-    static function overwrite(string $name, string $newValue) : bool {
-        if(!self::exists($name))
-            return false;
-
+    static function overwrite(string $name, string $newValue) : void {
         $_POST[$name] = $newValue;
-
-        return true;
     }
 
     /**
