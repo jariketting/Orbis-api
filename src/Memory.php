@@ -103,6 +103,9 @@ class Memory extends Model {
 
     private static function addRequest() : void {
         $memory = new Memory(0);
+
+        $memory->id = Session::getUser()->id;
+
         $memory->create(); //create user
         $memory->bindFields(); //bind fields
 
