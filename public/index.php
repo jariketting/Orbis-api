@@ -2,6 +2,7 @@
 require_once '../vendor/autoload.php';
 
 use Orbis\Diary;
+use Orbis\File;
 use Orbis\Follow;
 use Orbis\Helper;
 use Orbis\JsonResponse;
@@ -62,6 +63,9 @@ switch (Router::getType()) {
         break;
     case 'memory':
         Memory::request();
+        break;
+    case 'add_image':
+        File::addImage();
         break;
     default:
         JsonResponse::error('Invalid type given', 'A type was provided but seems to be invalid', 400);
