@@ -34,9 +34,9 @@ class Post
     /**
      * @param $name
      *
-     * @return string
+     * @return
      */
-    static function get(string $name) : string {
+    static function get(string $name) {
         //validate post
         if(isset($_POST))
             if(isset($_POST[$name]))

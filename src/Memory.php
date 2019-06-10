@@ -1,6 +1,8 @@
 <?php
 namespace Orbis;
 
+use PDO;
+
 /**
  * Class Memory
  * @package Orbis
@@ -15,7 +17,8 @@ class Memory extends Model {
             $longitude,
             $latitude,
             $datetime,
-            $user_id;
+            $user_id,
+            $images;
 
     /**
      * User constructor.
@@ -41,6 +44,7 @@ class Memory extends Model {
         $this->latitude = (string)$this->_fields->latitude;
         $this->datetime = (string)$this->_fields->datetime;
         $this->user_id = (string)$this->_fields->user_id;
+        $this->images = [];
     }
 
     /**
@@ -81,6 +85,25 @@ class Memory extends Model {
         } else
             $memory = new Memory($id);
 
+        $query = Database::get()->prepare('
+            SELECT file_id
+            FROM memory_file
+            WHERE memory_id = :memory_id
+        ');
+        $query->bindParam(':memory_id', $memory->id, PDO::PARAM_INT);
+        $query->execute();
+
+        if(!$query)
+            JsonResponse::error('Could not get images');
+
+        $images = $query->fetchAll(PDO::FETCH_OBJ);
+
+        if($images) {
+            foreach($images as $image) {
+                $memory->images[] = new File($image->file_id);
+            }
+        }
+
         JsonResponse::setData($memory);
     }
 
@@ -98,6 +121,9 @@ class Memory extends Model {
         $memory->update();
         $memory->bindFields(); //rebind fields
 
+        if(Post::exists('images'))
+            $memory->setImages(Post::get('images'));
+
         JsonResponse::setData($memory); //send new memory data back
     }
 
@@ -108,6 +134,9 @@ class Memory extends Model {
 
         $memory->create(); //create user
         $memory->bindFields(); //bind fields
+
+        if(Post::exists('images'))
+            $memory->setImages(Post::get('images'));
 
         JsonResponse::setData($memory);
     }
@@ -124,5 +153,29 @@ class Memory extends Model {
             JsonResponse::error('Can only delete own memories','You can not delete others memories!', 400);
 
         $memory->delete();
+    }
+
+    private function setImages(Array $ids) : void {
+        $delete = Database::get()->prepare('
+        DELETE FROM memory_file
+        WHERE memory_id = :memory_id
+        ');
+        $delete->bindParam(':memory_id', $this->id, PDO::PARAM_INT);
+        $delete->execute();
+
+        if($ids) {
+            $query = Database::get()->prepare('
+                INSERT INTO memory_file
+                (memory_id, file_id) VALUES (:memory_id, :file_id)
+            ');
+
+            foreach ($ids as $id) {
+                $query->bindParam(':memory_id', $this->id, PDO::PARAM_STR);
+                $query->bindParam(':file_id', $id, PDO::PARAM_STR);
+                $query->execute();
+
+                $this->images[] = new File($id);
+            }
+        }
     }
 }
