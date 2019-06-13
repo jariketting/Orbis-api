@@ -63,7 +63,7 @@ class User extends Model
                 self::updateRequest();
                 break;
             case 'add':
-                if($sessionId) self::sessionIdError();
+                if($sessionId && $sessionId != "") self::sessionIdError();
                 self::addRequest();
                 break;
             case 'delete':
@@ -94,6 +94,8 @@ class User extends Model
             $user = Session::getUser();
         else
             $user = new User($id);
+
+        $user->image = new File($user->image_id);
 
         JsonResponse::setData($user);
     }
