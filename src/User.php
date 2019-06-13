@@ -188,6 +188,8 @@ class User extends Model
         $search = Post::get('search');
         $user = Session::getUser();
 
+        $limit = (($search) ? 0 : 25);
+
         $users = [];
 
         $query = Database::get()->prepare('
@@ -196,8 +198,10 @@ class User extends Model
             WHERE id != :user_id
             AND private != 1
             AND (username LIKE \'%'.$search.'%\' OR name LIKE \'%'.$search.'%\')
+            LIMIT :limit
         ');
         $query->bindParam(':user_id', $user->id, PDO::PARAM_INT);
+        $query->bindParam(':limit', $limit, PDO::PARAM_INT);
         $query->execute();
 
         if(!$query)
