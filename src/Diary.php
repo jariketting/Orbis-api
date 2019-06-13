@@ -32,6 +32,9 @@ class Diary
             unset($memory->user_id);
             unset($memory->longitude);
             unset($memory->latitude);
+
+            $memory->getImages($memory->id);
+
             $memories[] = $memory;
         }
 

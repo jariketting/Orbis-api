@@ -155,6 +155,27 @@ class Memory extends Model {
         $memory->delete();
     }
 
+    public function getImages(int $memoryId) : void {
+        $query = Database::get()->prepare('
+            SELECT file_id
+            FROM memory_file
+            WHERE memory_id = :memory_id
+        ');
+        $query->bindParam(':memory_id', $memoryId, PDO::PARAM_INT);
+        $query->execute();
+
+        if(!$query)
+            JsonResponse::error('Could not get images');
+
+        $images = $query->fetchAll(PDO::FETCH_OBJ);
+
+        if($images) {
+            foreach($images as $image) {
+                $this->images[] = new File($image->file_id);
+            }
+        }
+    }
+
     private function setImages(Array $ids) : void {
         $delete = Database::get()->prepare('
         DELETE FROM memory_file
