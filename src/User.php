@@ -53,6 +53,8 @@ class User extends Model
     public static function request() : void {
         $sessionId = Post::exists('session_id');
 
+        if($sessionId == "") $sessionId = false;
+
         switch (Router::getAction()) {
             case 'get':
                 if(!$sessionId) self::sessionIdError();
