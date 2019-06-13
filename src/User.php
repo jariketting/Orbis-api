@@ -188,7 +188,7 @@ class User extends Model
         $search = Post::get('search');
         $user = Session::getUser();
 
-        $limit = (($search) ? 0 : 25);
+        $limit = (($search) ? 999 : 25);
 
         $users = [];
 
@@ -218,6 +218,9 @@ class User extends Model
             unset($user->notifications);
             unset($user->private);
             unset($user->bio);
+
+            $user->image = new File($user->image_id);
+
             $users[] = $user;
         }
 
