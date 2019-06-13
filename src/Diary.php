@@ -35,6 +35,11 @@ class Diary
 
             $memory->getImages($memory->id);
 
+            $memory->image = null;
+
+            if(isset($memory->images[0]))
+                $memory->image = $memory->images[0];
+
             $memories[] = $memory;
         }
 
