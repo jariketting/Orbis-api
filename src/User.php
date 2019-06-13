@@ -194,6 +194,7 @@ class User extends Model
             SELECT id
             FROM user
             WHERE id != :user_id
+            AND private != 1
             AND (username LIKE \'%'.$search.'%\' OR name LIKE \'%'.$search.'%\')
         ');
         $query->bindParam(':user_id', $user->id, PDO::PARAM_INT);
