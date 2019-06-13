@@ -16,11 +16,16 @@ class Diary
         $page = Post::get('page');
         $order = Post::get('order');
         $search = Post::get('search');
+        $id = Post::get('id');
 
         if(!$page) $page = 1;
 
         $user = Session::getUser();
-        $memoryIds = self::getMemoryIds($user->id, $page, $order, $search);
+
+        if($id == "")
+            $id = $user->id;
+
+        $memoryIds = self::getMemoryIds($id, $page, $order, $search);
 
         $memories = [];
 
