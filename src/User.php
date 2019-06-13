@@ -114,6 +114,8 @@ class User extends Model
         $user->update(); //update user data
         $user->bindFields(); //rebind fields
 
+        $user->image = new File($user->image_id);
+
         JsonResponse::setData($user); //send new user data back
     }
 
@@ -130,6 +132,8 @@ class User extends Model
         $user = new User(0);
         $user->create(); //create user
         $user->bindFields(); //bind fields
+
+        $user->image = new File($user->image_id);
 
         $user->session_id = Session::create($user->id); //log user in and send back session id.
 
